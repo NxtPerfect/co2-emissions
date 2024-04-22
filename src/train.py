@@ -1,8 +1,8 @@
-from torch import nn
-from torch import optim
-from torchvision import torch
+import torch
+from torch import nn, optim
+from torch.utils.data import DataLoader
 from src.model import NeuralNetwork
-from src.dataset import train_dataloader, test_dataloader_emnist, test_dataloader_semeion
+from src.dataset import CO2Dataset, loadCSV
 
 def train():
     device = (
@@ -17,12 +17,16 @@ def train():
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.025)
 
+    data = CO2Dataset(loadCSV("data/emissions.csv"))
+    batch_size = 24
+    dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.1)
 
     num_epochs = 50
 
     while num_epochs > 0:
-        for inputs, labels in train_dataloader:
+        for inputs, labels in data:
             inputs, labels = inputs.to(device), labels.to(device)
 
             outputs = model(inputs)
