@@ -1,0 +1,2 @@
+- [x] load csv
+- [ ] get labels and params
