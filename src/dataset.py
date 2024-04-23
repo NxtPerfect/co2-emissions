@@ -1,11 +1,19 @@
 import numpy as np
 import pandas as pd
 from torch.utils.data import Dataset, DataLoader
+from sklearn.preprocessing import LabelEncoder
 import torch
 
 def loadCSV(path: str):
     data = pd.read_csv(path)
-    print(data)
+    # print(data)
+    label_encoder = {}
+    # Should convert everything to values
+    for col in ["year", "state-name", "sector-name", "fuel-name"]:
+        label_encoder[col] = LabelEncoder()
+        data[col] = label_encoder[col].fit_transform(data[col])
+    # print(data)
+    return data
 
 class CO2Dataset(Dataset):
     def __init__(self, dataframe):
@@ -20,4 +28,5 @@ class CO2Dataset(Dataset):
                 'features' : torch.tensor(self.data[idx], dtype=torch.float),
                 'target': torch.tensor(self.targets[idx], dtype=torch.float)
                 }
-        return sample
+        return torch.tensor(self.data[idx], dtype=torch.float),torch.tensor(self.targets[idx], dtype=torch.float)
+
